@@ -1,5 +1,4 @@
-# src/game.py
-
+from src.minimax import minimax
 import numpy as np
 
 class TicTacToe:
@@ -40,3 +39,9 @@ class TicTacToe:
 
     def num_empty_squares(self):
         return len(self.available_moves())
+
+    
+    def get_ai_move(self):
+        if len(self.available_moves()) > 0:
+            return minimax(self, 0, 1)['position']
+        return None
