@@ -1,26 +1,22 @@
-from src.minimax import minimax
 import numpy as np
 
 class TicTacToe:
     def __init__(self):
-        self.board = np.zeros((3, 3), dtype=int)  # 3x3 board initialized with zeros
+        self.board = np.zeros((3, 3), dtype=int)
         self.current_winner = None
 
     def print_board(self):
-        # Print the board
         for row in self.board:
-            print(row)
+            print(' | '.join(['X' if x == 1 else 'O' if x == -1 else ' ' for x in row]))
+            print('-' * 5)
 
     def available_moves(self):
-        # Return a list of available moves (i.e., empty cells)
         return [(r, c) for r in range(3) for c in range(3) if self.board[r, c] == 0]
 
     def empty_squares(self):
-        # Return boolean indicating whether there are empty squares on the board
         return np.any(self.board == 0)
 
     def make_move(self, square, player):
-        # Place a move on the board for a player (1 for 'X' and -1 for 'O')
         if self.board[square] == 0:
             self.board[square] = player
             if self.winner(square, player):
@@ -29,7 +25,6 @@ class TicTacToe:
         return False
 
     def winner(self, square, player):
-        # Check if the player has won
         row_ind, col_ind = square
         row_win = all([self.board[row_ind, i] == player for i in range(3)])
         col_win = all([self.board[i, col_ind] == player for i in range(3)])
@@ -39,9 +34,3 @@ class TicTacToe:
 
     def num_empty_squares(self):
         return len(self.available_moves())
-
-    
-    def get_ai_move(self):
-        if len(self.available_moves()) > 0:
-            return minimax(self, 0, 1)['position']
-        return None
