@@ -1,37 +1,30 @@
-# main.py
+import cv2
 
-from src.generate import extract_features, generate_caption, define_model
-from PIL import Image
-import matplotlib.pyplot as plt
-import pickle
-import numpy as np
+harcascade = "model/haarcascade_frontalface_default.xml"
+cap = cv2.VideoCapture(0)
 
-def main(image_path):
-    # Load the tokenizer
-    with open('tokenizer.pkl', 'rb') as f:
-        tokenizer = pickle.load(f)
-    
-    # Load the model
-    model = define_model(vocab_size=5000, max_length=34)  # Replace with actual values
-    model.load_weights('model.h5')  # Replace with the path to your trained model
+cap.set(3, 640)  # Set the width
+cap.set(4, 480)  # Set the height
 
-    # Extract features from the image
-    features = extract_features(image_path)
-    
-    # Generate caption
-    caption = generate_caption(model, tokenizer, features, max_length=34)
-    print("Generated Caption:", caption)
+# Load the cascade classifier outside the loop for efficiency
+facecascade = cv2.CascadeClassifier(harcascade)
 
-    # Display the image and caption
-    image = Image.open(image_path)
-    plt.imshow(image)
-    plt.title(caption)
-    plt.axis('off')
-    plt.show()
+while True:
+    success, img = cap.read()
+    if not success:
+        break
 
-if __name__ == "__main__":
-    # Path to the image
-    image_path = "data/images/img.jpg"  # Replace with your image path
-    
-    # Call the main function
-    main(image_path)
+    img_gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
+    faces = facecascade.detectMultiScale(img_gray, 1.1, 4)
+
+    for (x, y, w, h) in faces:
+        cv2.rectangle(img, (x, y), (x + w, y + h), (0, 255, 0), 2)
+
+    cv2.imshow("Face", img)  # Show the original image with rectangles
+
+    if cv2.waitKey(1) & 0xFF == ord("q"):
+        break
+
+# Release the video capture object and destroy all windows
+cap.release()
+cv2.destroyAllWindows()
